@@ -1,0 +1,1602 @@
+JTDX v18.0.0.133 release notes.
+
+  JTDX is derivative work forked from the WSJT-X r6462 software with some later WSJT-X v1.7
+patches applied.
+  Source code is modified with contributions from Arvo ES1JA, Richard G7OED, David MM0HVU,
+Alexey RA4UDC, Vitaly UA3ALE, Oleg US-E-12, Alex VE3NEA and LY3BG family: Vytas and Rimas Kudelis. 
+
+  This release notes are created by Igor UA3DJY on November 19th, 2017. 
+
+  Support being provided by Igor UA3DJY, email address: c_igor at inbox.ru 
+and by HF community in the JTDX Yahoo group. 
+
+More detailed information, built software, link to the source code, optional user interfaces, 
+HF CALL3.txt file, test results, release notes can be found in:
+
+JTDX Web sites: 
+http://www.jtdx.tech/
+http://www.qrz.lt/ly3bg/JTDX/jtdx.html
+
+JTDX Yahoo technical group:
+https://groups.yahoo.com/neo/groups/JTDX/info
+
+Russian JT65/WSJT-X forum:
+http://forum.qrz.ru/6-cifrovye-vidy-radiosvyazi/44060-proekt-wsjt-x-mody-jt65-jt9-wspr-jt4-jtmsk-rabota-s-testovym-softom.html
+
+Facebook group focused on the JTDX software usage: 
+https://www.facebook.com/groups/JTDX.HF.evaluation/
+
+CALL3.TXT file also being supplied together with the software installation package.
+
+Starting from November 1st, 2016 and until July, 2017 CALL3.TXT data was based on JT65/JT9 spots made 
+by JTAlert software and collected from http://hamspots.net resource. 
+Many thanks to Laurie VK3AMA for this contribution.
+
+Starting from July 2017 we have not got access to hamspots.net spot data and can not provide CALL3.TXT updates.
+
+__________________________________
+
+Changes implemented in the source code.
+
+r6462mod5:
+- modified modulator: improved level fading at end of the message transmission.
+- 'RRR' message is replaced with 'RR73' message. 'Log QSO' prompt can be triggered
+  by transmission any of these messages: 'RRR', 'RR73', '73'  
+- three-pass decoding is implemented, decoder thresholds optimized for each pass.
+  Advanced settings tab now provides possibility to choose between two- and three-pass decoding.
+- changes of the FFT window functions, optimized for number of correct decodes criteria.
+- implemented spectrum distortion functions for each decoding pass, optimized these functions 
+  basing on the maximum number of correct decodes
+- implemented functionality of high sensitivity, control button Preamp in main UI window, and
+  possibility to choose number of passes in the Advanced settings tab. 'Random erasure patterns'
+  is set to 8 for Preamp mode, it is not affected by settings in the Advanced tab now.
+  Decoder thresholds and spectrum distortion functions were optimized for each Preamp pass.
+  Signal subtraction is used between Preamp decoding passes.
+- removed 'Robust sync' manual activation from Advanced settings tab.
+- improved user interface in the main window.
+__________________________________
+
+r6462mod6:
+- improved accuracy in signal subtraction (eliminated error in number of the samples). Small
+  changes to the user interface main window.
+__________________________________
+
+r6462mod7:
+- user interface improved, splitter inserted between left and right parts of the main window 
+- users now have choice between RRR and RR73 message
+- nbirdie(extract.f90) value optimization brougth some more new correct decodes. nbirdie=7 being
+  used for Preamp OFF mode, nbirdie=6 for Preamp ON mode
+- number of decoding attempts for Preamp OFF mode is set to 100
+- number of decoding attempts for Preamp ON mode now can be choosen from this range: 1000,2500,
+  5000,7500,10000 via Advanced settings tab by values 1,2,3,4,5
+__________________________________
+
+r6462mod8:
+- number of decoding attempts for Preamp OFF mode increased from 100 to 300
+- implemented 'Filter' button/functionality: eliminating vast majority of the false decodes
+- improved JT65 decoding efficiency for DT range [-1..0], this functionality is implemented
+  only in the Filter ON mode by 26000 sample offset of the input data
+- for all Preamp/Filter combinations increased JT65 DT decoding range
+- for all Preamp/Filter combinations implemented some additional filtering of the false decodes
+- standard CQ message is generated on WSJT-X start up, it should eliminate some cases of the empty 
+  message transmission
+- input data is reloaded if 'Filter' button is triggered, so it is possible to decode again latest
+  RX interval data in any combination of the Filter/Preamp modes using button 'Decode'
+__________________________________
+
+r6462mod9:
+- implemented dual SYNC search functionality with 1/4 symbol spectrum shift, getting more 
+  correct JT65 decodes.
+__________________________________
+
+r6462mod10 JT65a optimization:
+- is based on dual SYNC mod9, Preamp+Filter functionality, Preamp and Filter buttons deleted from UI
+- SYNC search upper frequency is limited by 2700 Hz value
+- new SWL mode/button introduced, providing maximum decoding efficiency
+- for SWL OFF mode candidate ranking based on SYNC value being used
+- for SWL OFF mode number of candidates is limited for each pass (17/35/35) basing on the statistics
+- for SWL OFF mode dynamic decoding attempts as function of number of candidates implemented
+- decoding time is optimized and normalized for SWL OFF mod, decoding efficiency is improved
+__________________________________
+
+r6462mod11 JT65a optimization:
+- first decoding pass got two subpasses, both using the same SYNC list of candidates. 
+  For subpass 1.1 maximum number of candidates is limited to 21, for subpass 1.2 to 25.
+  Decoded signals being marked in the SYNC list and ignored while doing subpass 1.2.  
+  In fact in mod11 revision we have got very effective four-pass JT65a decoding.
+- SWL ON functionality is changed: now it is based on the SWL OFF functionality, simple 3 unit 
+  offset is applied to the decoding attempts value settings for SWL ON mode. SWL ON and SWL ON decoding
+  attempts approximately balanced for corresponding decoding time.   
+__________________________________
+
+r6462mod12 JT65a optimization, focused on weak signals reception:
+- automatic weak signals decoding mode for number of candidates less than 9
+- four passes are used for JT65a decoding with common SYNC candidate list if number of candidates 
+  is less than 9
+- SYNC threshold 3.0 being used to pass weak JT65a signal to the FTRSD decoder
+- number of decoding attempts nvec is dynamically calculated for each pass basing on the number
+  of good SYNC candidates, decoded signals being marked in the SYNC list and ignored while doing 
+  passes 2,3,4
+- srand function is used in the FTRSD decoder if number of candidates is less than 9
+- improved decoding time balance for SWL OFF/ON modes
+__________________________________
+
+r4662mod14 changes:
+- implemented hinted decoding for HF JT65a operation on the QSO frequency, hint65.f90 source code is 
+  adopted from the WSJT-X v1.7 r6606 revision. CALL3.txt file shall be used for hinted decoding, only
+  first 15000 records being processed in r6462mod14. JT65+JT9 combined mode only supported.
+- attempt to eliminate r6462mod12 degradation of the JT65a signals decoding efficiency in the industrial
+  noise band environment, mostly useful for 80/160m bands operation 
+__________________________________
+
+r646mod14.1
+- fixed defect in logic of the choosing decoding passes: recovered signal decoding for the small number
+  of SYNC candidates 
+__________________________________
+
+r646mod15
+- implemented all standard messages for hinted decoding, added RR73 message, totally 66 messages/codewords
+  generated per each record of the CALL3.TXT file
+- up to 25000 records from CALL3.TXT file can be processed now
+__________________________________
+
+r646mod15.1
+- implemented asymmetric tunable DT window for hinted decoding
+- hinted decoding bandwidth also limited to 7Hz after the frequency correction
+__________________________________
+ 
+r646mod15.2
+- implemented additional hinted decoder for 'DX Call' and 'DX grid' data
+- hinted decodes now marked by the asterisk, not supported in the left decoding window if 'Show DXCC
+  and worked B4 status' is enabled  
+__________________________________
+
+r646mod15.3
+- additional criterion implemented for hinted decoding: distance between the best codeword 
+  and Gaussian(AGWN) noise, increasing probability of hinted decodes for the CALL3 and DX Call decoders
+__________________________________
+
+JTDX v15.4
+- additional, third criterion: multiplicative combination of the two previous criteria applied 
+  in the CALL3 based hinted decoder, allowing to reduce number of the false CALL3 based hinted decodes
+  with no decoder's sensitivity degradation
+- DX Call based hinted decoder is stepped down to mod15.2 source code for non CQ messages only. 
+  It reduced number of the DX Call based false hinted decodes as tradeoff of sensitivity
+- corrected UI defect of mainwindow expansion for WSPR2 mode
+- two new buttons are put in the main window: Hint and Clean DX, last one can be triggered by ALT-X combination.
+  New buttons make user interface as more friendly one, allowing user to avoid some false hinted decodes.
+- transition started from modified WSJT-X to standalone JTDX software  
+__________________________________
+
+JTDX v15.5
+- proper software name indication in station information and statistics in the pskreporter.info wed site
+- spots with RR73 grid locator blocked for reporting to pskreporter.info
+- spots with hinted decodes blocked for reporting to pskreporter.info
+- DXCall and DXGrid windows autoclearance if CQ button is clicked
+__________________________________
+
+JTDX v15.6
+- fixed defect with SWL mode, after SW restart SWL mode on settings were not applied in previous versions
+- fixed minor defect in UI1 where standard/free message windows size was shrinked, this defect coming from v15.4
+- implemented additional, CALL3 based, wideband hinted decoder for CQ messages with -28dB SNR sensitivity, this functionality 
+  can be activated by the Hint button. DT range is limited from -0.5 to 1.0 for this decoder.
+- implemented CQ DX standard message, user can choose between CQ and CQ DX message using DX checkbox
+- implemented Filter functionality: 400Hz bandwidth is used for decoding, 100Hz bandwidth is used for displaying decoded messages
+- implemented asterisk indication of the hinted decodes for 'Show DXCC and worked B4 status' feature
+- UI is modified with Filter button and DX checkbox to support new functionality
+__________________________________
+
+JTDX v15.7  JT65 functionality
+- removed unnecessary spectra recalculation for every candidate, now JT65 spectra being recalculated only if previous
+  candidate was decoded and signal subtracted. This fix shall make decoding a bit faster.
+- turned on signal subtraction on the 3rd decoding pass, reduced number of the false FTRSD decodes
+- fchisq65 and afc65b source code is modified, now providing better DT calculation accuracy and reduced number
+  of the false FTRSD decodes
+__________________________________
+
+JTDX v15.8  JT65 functionality
+- new wideband hinted decoder implemented for the CQ DX message
+- turned on CQ and CQ DX wideband hinted decoders on the 2nd and 3rd decoding passes
+- modifed source code fchisq65, got more linearity and better accuracy in DT calculation
+  of the weak signals, bringing more correct FTRSD decodes
+- implemented FTRSD decoder bypass if initial SYNC value on the QSO frequency is less 
+  than 1.0
+- implemented filtering of some false 17 and 18 character long FTRSD decodes if DT 
+  of the signal is outside of the -0.5...1sec range, source code chkfalse.f90. CALL3.TXT 
+  file data is used for this functionality and this filtering is not activated if number 
+  of records in CALL3.TXT file is less than 16000. CALL3.TXT data loaded in memory 
+  at the first attempt to check decoded message.
+- modified JT65 signal simulator with CQ DX message
+- minor change in UI, tab name Help -> About JTDX
+__________________________________
+
+JTDX v15.9  JT65 functionality
+- correlation function thresholds (ccfbest variable) implemented for various negative DT ranges,
+  this approach lets to decrease number of candidates hence decreasing decoding time
+- fifth decoding pass is implemented. This functionality will gain number of the decoded messages
+  if number of signals on the band is greater than 20. There is also gain in weak signal FTRSD
+  and hinted decodings.
+__________________________________
+
+JTDX v16.0  JT65 functionality
+- filtering of the false FTRSD decoded messages expanded down to the 14-character message length
+- additional criterion(0.005sec DT offset) implemented to filter out FTSRD false decodes with grid 
+  locators caused by the SYNC signal harmonics (bad TX signal or IMD in the RX path), the same 
+  chkfalse.f90 source code is used for filtering, also based on the CALL3.TXT file
+- checking for SYNC harmonics implemented, based on three criteria: DT offset, ccfbest value, 
+  frequency greater than 1500Hz. Wideband hinted decoders bypass is used if signal meeting these
+  criteria.
+- mouse left button double click on the waterfall now triggering 'Filter' functionality where messages
+  will be decoded and signals subtracted in 400Hz bandwidth, but only messages in 50Hz bandwidth 
+  will be shown in the decoded messages window. This is a bit different from the 'Filter' button 
+  functionality where messages shown in the decoded window within 100Hz bandwidth
+- found and fixed defect: wrong signals were subtracted for hinted decodes
+- cleaned up some rubbish and some not used code, many integer variables changed to the logical type.
+__________________________________
+
+JTDX v16.1
+- JT65: eliminated minor defect of wrong signal subtraction for decoded messages on the QSO frequency 
+  by the hinted decoders
+- JT65: added new source code for calculation power of last 8 symbols of the SYNC signal. For the first pass 
+  of decoding, list of the signals/candidates being sorted now basing on new criterion: multiplication 
+  of the CCF and last 8 symbols power values. 
+- JT65: implemented signal subtraction for the dupe decoded messages on the first pass of decoding 
+- deleted JT65 program source code, this software was used for the test purpose
+- deleted JT4 related Fortran source code
+- JT65: withdrawn (21 + QSO frequency) number of candidates limitation for the first subpass of the first
+  pass of decoding
+- country file cty.dat updated to version CTY-2608
+__________________________________
+
+JTDX v16.2 JT65 functionality
+- minor defect fixed: in v16.1 index of the dtchk data structure could go out of boundary
+  if there is heavy distortion in the RX audio path. Two patches applied: index maximum value increased
+  from 200 to 300 and maximum number of candidates for first decoding pass is limited to 150.
+- activated four threads for Fast Fourier Transform in the filbig.f90 source code
+- cleaned up and checked logic in source code jt65_decode.f90 sync65.f90 xcor.f90 symspec65.f90
+- at first decoding pass in jt65_decode.f90 applied dynamic threshold for candidate choosing based
+  on the first three most SYNC values, if there are less than 9 candidates detected in sync65.f90
+- major defect fixed: starting from v15.9 values from FTRSD decoder were not passed to variables
+  nrtt1000, nhard_min, ntotal_min in jt65_decode.f90. This bug caused most of the FTRSD false decodes.
+- sync value thresholds increased in syn65.f90: for (QSO frequency +-1Hz) applied threshold 0.4,
+  for (QSO frequency +-3Hz) changed threshold from 0.5 to 0.8. This changes eliminated some false hinted
+  decodes as trade off of hinted decoding sensitivity on the QSO frequency.
+- minor defect fixed: variable qsofreq was initialized in wrong place in sync65.f90
+- applied corrected frequency value for signal subtraction in subtract65.f90
+- Echo and ISCAT modes now accessible in the optional user interface only
+__________________________________
+
+JTDX v16.3 JT65 decoding functionality
+- minor defect fixed: srand generator was used in FTRSD in 2nd...4th decoding passes if number of candidates
+  is less than 8, this bug could cause some false FTRSD decodes
+- minor defects fixed: in logic of candidate processing in decode65a.f90 and in making of the candidate list
+  in sync65.f90 
+- decreased SYNC threshold trhesh0 for first decoding pass in jt65_decode.f90 and sync65.f90 from 2.5 to 2.3,
+  with automatic value choice of this threshold, based on the SYNC values of the signals 
+- limited thresh3 usage in jt65_decode.f90 by first subpass of the first decoding pass
+- reworked and changed decoder bypass decision logic, fixed minor bug that might cause some false decodes 
+- limited DT range for making candidate list in sync65.f90 to -5.3 ... 5.2 sec
+- changed sampling frequency value from 1378.125 to 1377.2321 in decode65a.f90, afc65b.f90, twkfreq65.f90
+- increased resampling factor from 4 to 8 in fil6521.f90
+- decreased LPF bandwidth twice in fil6521.f90, improved attenuation in stopband from 38 to 60dB
+- adjusted reported SNR value
+- multiple source code calculation accuracy and clean up changes
+__________________________________
+
+JTDX v16.4, JT65 decoding functionality
+- defect fixed: wrong response message was selected on mouse double click 
+  on the 'mycall hiscall RR73' message
+- defect fixed: one of the variables in SYNC tail power calculation was not initialized
+- defect fixed: 4 arguments were passed while calling decoder.f90 in jt9a.f90 subroutine 
+  while only 3 are accepted
+- came back to 1378.125 Hz sampling frequency in decode65a.f90, afc65b.f90, twkfreq65.f90: 
+  corrected an accuracy error I introduced in v16.3 due to the wrong usage of calculator
+- in filbig.f90: increased number of taps of the anti-aliasing LPF filter from 15 to 499, 
+  fully utilising filtering efficiency in the frequency domain
+- in fil6521.f90: increased number of taps of the anti-aliasing LPF filter from 21 to 23
+- in fil6521.f90: implemented one more 21-tap LPF filter with 172Hz sampling frequency
+  to improve further processing of the candidate's SYNC pattern
+- adjusted fil6521.f90 processing delay in DT value, decode65a.f90 source code 
+- changed to static ones some variables in the signal processing to reduce negative affect 
+  of the current software memory leakage on the signal decoding stability
+- in hinted decoders reduced number of the static variables to decrease memory usage
+- adjusted SNR indication after filter changes in fil6521.f90
+__________________________________
+
+JTDX v16.6
+- applied WSJT-X patches r6489,6518,6521,6523,6755,6756,6757,6762,6766
+
+- changed default configuration settings(used for first start of JTDX software):
+    mode=JT65+JT9, modeTX=JT65, LockTX=RX is OFF, CQ 
+    waterfall settings: bin/pixels=5, JT65 2400 JT9, N Avg=1, Flatten is OFF, Current
+    Advanced tab: decoding attempts=3, decoding passes=4, hinted decoding DT range=1
+    Colors tab: default colors
+    font settings of the decoded message: Consolas, 11, Bold   
+
+- changed user interface UI1:
+    interval time progress bar now has red color for TX, green color for RX
+    clock moved, date is deleted
+    dial frequency and UTC labels background colors changed to gray one, text to deep blue color
+    direction of TX to RX and RX to TX frequency overwriting is shown by arrows now
+    WSJT-X icon in the taskbar will be blinking if other application is active and decoded message containing user's call
+
+- DXCC country prefix being now shown instead of the country name, it has no connection to the 'worked B4' functionality  
+
+- decoded CQ message now being shown with text color instead of the background color
+
+- changed 'Worked B4' functionality, background colors can be activated independently for any option and will be applied according
+  to this hierarchy order:
+    new DXCC per log
+    new DXCC per band or (new DXCC per band and per mode)
+    new call per log
+    new call per band or (new call per band and per mode)
+
+  Additional buttons created in Colors tab to support new 'Worked B4' functionality.
+
+- changed configuration Settings, in the General tab added new 'Worked B4' and 'beep on my call' controls
+
+- symbol '@' in the macros being now substituted by 'DX Call'
+
+- fixed minor defect of the missed background color for AnswCQ label in the user interface
+
+- added sound alert by system sound for user call presence in the decoded message. Starting from MS Windows Vista default Audio device
+is used for this alert, in MS Windows 10 this system sound is called as 'default beep'. This functionality was not tested under Linux. 
+
+- SkipGrid/Skip TX1 checkbox added in the QSO controls widget, message with report will be generated first if this box is checked.
+  This functionality is aimed for making shorten QSOs. 
+
+- defect fixed in symspec65.f90 source code, ref22(NSZ) array was not declared there
+
+- mouse left button double click on the decoded standard message will change RX frequency if LockTX=RX checkbox is not checked. 
+  If Ctrl button pressed, mouse left button double click on the decoded standard message will change RX and TX frequency.
+
+- pressing F7 keyboard button will open log file wsjtx_log.adi by editor software set in the operating system for .adi extension
+__________________________________
+
+JTDX v16.6.1
+
+- removed part of the r6755 patch from the source code HamlibTransceiver and TransceiverFactory in order
+  to recover JTDX functionality under MS Windows XP 
+__________________________________
+
+JTDX v16.7
+
+- code is added to recognise country properly for CQ NA, CQ AS and similar free text messages
+
+- step deltaa(3) is changed to 2.0 value in the afc65b.f90 source code
+
+- JT65 SYNC decimation filter is moved from time domain to the frequency domain, from fil6521.f90 to filbig.f90 source code, 
+  fil6521.f90 source code is obsolete now
+
+- current time and date is added to the status bar
+__________________________________
+
+JTDX v16.8
+
+- interval time added to separation line in the left decoded text window
+
+- new filters implemented in the filbig.f90 source code
+
+- reworked source code: xcor.f90, afc65b.f90, fchisq65.f90 and twkfreq65.f90. 
+  setup65.f90 source code is not used anymore for building software, required functionality moved to
+  the decode65b.f90 source code.
+  Minor changes in the decoder.f90, jt65_decode.f90, sync65.f90 and decode65a.f90 source code.
+
+- minor changes in user interface UI1: smaller application window size can be set now by user
+
+- application and widegraph titles are changed to JTDX, installation path is changed to C:\JTDX\
+
+- SNR is adjusted in the -01...-31dB range with approximately 1dB accuracy. Simulated wav files were used for calibration, 
+  SNR offsets 1dB step array added to the jt65_decode.f90 source code.
+__________________________________
+
+JTDX v16.9
+
+- twkfreq65.f90 source code is not used for building software, frequency correction functionality is moved
+  to decode65a.f90 source code
+
+- linear signal frequency drift taken into consideration for signal subtraction
+
+- corrected lag range for correlation function in the ccf2.f90 source code
+
+- updated Hamlib3 for new transceiver's CAT support
+
+- SYNC signal power calculation is implemented in the decode65b.f90 source code, dupe candidates with the same
+  SYNC power are banned now to go to the decoders
+
+- QSO frequency candidates now have second decoding attempt with 1 sample offset at 1378.125 Hz sampling frequency,
+  it has improved decoder's sensitivity.
+
+- in overcrowded band conditions and at first decoding pass: QSO frequency candidate from the first position 
+  being now added to the last position of the candidate list, to get benefit from the signal subtraction
+
+- defect fixed: mouse's left button double click on the waterfall(is used to decode signal again with Filter functionality)
+  caused TX mode change from JT65 to JT9
+
+- major defect fixed in making of the candidate list, source code sync65.f90, this bug affected decoding stability
+  starting from JTDX version 16.3  
+__________________________________
+
+ JTDX v16.9.1
+
+- false decode filters are reworked for FTRSD decoder in the source code decode65b.f90
+
+- new candidate selection criterion is implemented for decoding passes 2...4 in sync65.f90. 
+  DT is multiplied by SYNC value, candidates with -0.5...+1 sec DT range have highest priority, linear 
+  DT slope factor function is applied to the criterion for candidates having DT outside of this range.    
+__________________________________
+
+ JTDX v17.0.1
+
+- software installation is changed, logbook and settings file are stored in folder %LOCALAPPDATA%\JTDX,
+  settings file has name JTDX.INI now. Prefix in the interface name for UDP connection is changed from
+  WSJT-X to JTDX.
+
+- implemented mutiple instances support for JTDX <-> JTAlert interaction, where multiple JTDX instances running
+  using key '--rig-name=' (suffix of the interface name for UDP connection). This functionality is supported
+  in JTAlert 2.8.5. Every JTDX instance shall be configured with unique UDP port number in the Settings-Reporting
+  tab.
+
+- defect fixed: starting from JTDX v16.9 there was excessive decoding time if there were few signals
+  on the band. This defect also caused too high sensitivity of the Hint decoders and some false hinted decodes.
+
+- WSJT-X patches r7229, r7233 are applied: TX audio level settings saving per band
+
+- TX audio level settings saving feature is expanded to the 'per band and per mode' basis,
+  many thanks to Arvo ES1JA for provided source code and testing this functionality  
+
+- minor change in the functionality is done: TX mode is set to JT65 instead of JT9 if user changing
+  mode from WSPR to JT65+JT9
+
+- minor change in configuration is done: hyphen sign is allowed now in 'My Call' window, letting to 
+  use complex SWL callsigns for band monitoring with spots reporting. Many thanks to Oleg US-E-12 for
+  provided solution.
+
+- software crash is fixed, caused by getting index of the dtchk() data structure out of the top bound.
+  Message 'input audio signal is distorted' being generated now and decoding this minute interval being
+  interrupted, while software will handle this issue and will continue to work.
+
+- Hint decoders bypass is implemented for scenario where signal SNR is greater than -05. This solution
+  will allow to decrease number of the false hinted decodes for distorted audio signal with no affect 
+  on the sensitivity.
+__________________________________
+
+ JTDX v17.1
+
+- decoding passes logic is changed in jt65_decode.f90, in result there is increased number of the weak 
+  signals decoded by FTRSD
+
+- defect is fixed, if callsign is clicked in JTAlert initial CQ message is now propagated into RX frequency
+  window. Many thanks to Arvo ES1JA for this patch. Thanks to Ed K0KC for reporting of this bug.
+
+- changed functionality for accepting decoded message from two Hint decoders operating on the RX frequency:
+  decoded Hint message is banned as the false one if there was message decoded by BM/FTRSD on one 
+  of the previous decoding passes that contains the same callsigns. It should reduce a bit number of the false 
+  Hint decodes. Thanks to Luc VE2FXL for reporting of this scenario.
+
+- new functionality is implemented for one of the four Hint decoders which working on RX frequency with CALL3.TXT
+  data: five minute (5 min 14 seconds) timer is (re-)started at end of the each transmission or if Hint button 
+  is activated by user, it is used to automatically enable/disable propagation of the non-CQ decoded Hint messages 
+  from this decoder. The messages will be shown on the screen if timer is running and are banned if timer is expired.
+  Hence if user making QSO then all messages being accepted from this decoder, if user going to the passive mode of band 
+  monitoring then in five consecutive RX intervals non-CQ messages from this decoder will be banned. Such approach 
+  will let user to reduce number of the false Hint decodes being in the band monitoring mode.
+  Thanks to Luc VE2FXL for reporting of this scenario.
+
+- first step done towards assisted BM/FTRSD decoder functionality. Upon exceeding defined thresholds decoded messages 
+  being checked with the matched filter against the received signal. If it is free message in it is not matched, then
+  this message is banned. In case it is standard message and it is not matched, then it is checked against CALL3.TXT
+  data if any of two callsigns exists in the CALL3.TXT. Standard message being treated as false one if both callsigns
+  are not found in the CALL3.TXT file.
+  This approach lets to ban from 30 to 50 percents of the false FTRSD decodes.
+
+- expanded sound notifications for the 'non-worked B4' status functionality. Many thanks to Vytas LY3BG and 
+  his son Rimas Kudelis for supplied source code and making tests of this functionality.
+__________________________________
+
+
+ JTDX v17.1.1  - is based on JTDX v17.1, has got alternative 'new one' notification functionality implemented 
+ by Arvo ES1JA
+__________________________________
+
+
+ JTDX v17.2
+
+- fixed wrong UTC indication if interval or audio wav file being decoded again by Decode button
+
+- fixed wrong 'new one'(worked B4) functionality notification for single JT9 or JT65 mode of operation, many thanks to
+  Vytas LY3BG and Rimas Kudelis for this patch
+
+- auto stop Hint five minute timer is also applied to DX Call Hint decoder.
+  Thanks to Luc VE2FXL for reporting of this scenario.
+
+- directional CQ WSJT-X patches 'CQ AA'- 'CQ ZZ' (E9AA-E9ZZ) r7289, r7294 are applied. It is standard type message user
+  may type now in the free message box
+
+- '@ TNX 73' TX macro is set as default free message, where '@' symbol handles 'his call'
+
+- RX frequency CALL3.TXT data based Hint decoder is split to the message specific decoders, memory usage for this
+  group of the Hint decoders is reduced. There are three decoders now in this group:
+  - 'CQ hiscall hisgrid' message decoder
+  - 'mycall hiscall hisgrid' message decoder
+  - 'mycall hiscall report' message decoder, where report is -01...-30 only. R-01...R-30 report messages 
+     are not supported now in this group as these messages are covered by DX Call hint decoder
+
+- new wideband experience based Hint decoder is implemented, bringing approximately 5% more decoded messages for number
+  of decoding attempts set to 1 in the Advanced tab. This decoder using call/frequency data from the last two consecutive 
+  RX intervals.
+__________________________________
+
+ JTDX v17.2.1  - is based on JTDX v17.2, has got alternative improved and expanded 'new one' 
+ notification functionality, implemented by Arvo ES1JA. This version is especially created 
+ for public testing and this 'new one' notification functionality might come in the main JTDX branch 
+ if accepted by majority of users.
+ 
+ It is recommended to use default colors until this functionality is understood by user, and to set only
+ required criteria for checking.
+
+ So far it is possible to reset color settings to the default values, only if JTDX.INI file is deleted.
+
+- fixed bug (v17.1.1) where grid locator was not extracted correctly from
+ the non-CQ standard messages.
+
+
+- strikethrough or underline may now be used as notification for the Woked Call in CQ and MyCall messages.
+  Underline is set by default.
+
+- background color may now be used for the Worked Call notificaton, standalone or togehter with 
+   
+   strikethrough or underline of the decoded CQ  and MyCall messages.
+
+- if 'Inverse text/background color' checkbox is checked:
+
+   'CQ' and 'MyCall' messages met the 'New..' criterion will use their setting's text color as the backgound color,
+    while 'new..' color will be used for text in these messages. If there 'New..' criterion is not met then 'Worked Call'
+    color will be used for text in these messages if it is activated.
+
+    Tx messages always have background color notification.
+
+    All other standard messages will be using 'Standard Message' background color and 'New...' text color 
+    notification if 'Check all standard messages' checkbox is checked, otherway there is no any checking performed
+    for these messages.
+
+
+- user now can choose 'Standard message' background color (in 17.1.1 it was hardcoded as gray one).
+  Gray color us set by default. 
+
+__________________________________
+
+ JTDX v17.2.2  - is based on JTDX v17.2.1, has got alternative improved and expanded 'new one' 
+ notification functionality, implemented by Arvo ES1JA. This version is especially created 
+ for public testing and this 'new one' notification functionality might come in the main JTDX branch 
+ if accepted by majority of users.
+
+ v17.2.2 fixes some bugs found in the version 17.2.1:
+
+- Bold font usage failure
+
+- '@ TNX 73' TX macro is set as default free message, where '@' symbol handles 'his call',
+   user would have to delete old JTDX.INI file to make this change visible
+
+- several bugs where 'New ..' status was incorrectly reported
+
+Important note to the functionality description: 'Worked..' notification is a remaining action of the 'New..' checks,
+and as per design it being applied to 'CQ' and 'MyCall' messages only.
+
+__________________________________
+
+ JTDX v17.3  - is based on v17.2 source code, JT65 functionality:
+
+- DX Call based Hint decoder is split to the four focused decoders, bringing JT65 decoding sensitivity 
+  down to -34dB SNR:
+  - decoder for CQ/CQ DX messages
+  - decoder for messages with '-' reports
+  - decoder for messages with 'R-' reports
+  - decoder for RRR/RR73/73 messages
+
+- time transition from 23:5x to 00:0x is covered by uninterrupted interval numbering within 7 consecutive days 
+  of running JTDX software, this lets to support experience(previous intervals) based Hint decoders funcionality 
+  for the date change time window
+
+- new wideband experience(previous intervals) based Hint decoder is implemented for the basic CQ and full range of 
+  directional CQ messages (CQ AA to CQ ZZ)
+
+- disabled RX frequency CALL3.TXT based Hint decoder, which processed report "-" messages. This functionality 
+  is covered by DX Call based Hint decoder with better sensitivity and less resource being used.
+
+- for DXCall based Hint decoders, excluding CQ/CQ DX decoder, data from previous decoded intervals being used now
+  together with data from the DXCall window
+
+- excluding CQ/CQ DX message, other DXCall Hint decoders using additional trigger for getting turned on: RX frequecy
+  change
+
+- adjusted thresholds for all 10 Hint decoders using ratio (maximum sensitivity)/(acceptable number of the false decodes) 
+  as criterion   
+
+- expanded filters for the false FTRSD decodes, being now used QTH grid square and callsign prefix data
+
+- modified filter of the standard messages for the 'new one' notifications
+
+- notification settings are put in the common tab with the color settings, 'Notifications' tab in the Configuration 
+  user interface
+
+- applied WSJT-X patch r7360, to recover CW ID transmission for long callsigns
+
+- updated CALL3.TXT file as of December 12th 2016, 17340 records, supplied with the JTDX software package.
+
+Now there are 10 Hint decoders in the JTDX v17.3 software, using matched filters in wide bandwidth or RX frequency,
+focused on some range or specific messages, and using data from CALL3.TXT file or from previously decoded 
+intervals or from DXCall/DXGrid windows. All these decoders are activated by the Hint button, but some of them
+being turned off using timer and being brought back in service by transmission of the message of by change of the RX
+frequency.
+
+There is unchangeable DT window set in the code for some Hint decoders, previous intervals data based Hint decoders 
+using +-0.2sec DT window to the last decodes to process candidate, and only for two Hint decoders working on 
+the RX frequency and based on the CALL3.TXT data user may change DT range in the General->Advanced tab settings.
+
+JTDX software is made in such way that vast majority of the Hint decoders functionaly goes invisibly to user, and
+from user's point of view all Hint decoders being controlled by the Hint button. 
+  
+__________________________________
+
+ JTDX v17.3.1  - is based on v17.3 source code, notification functionality is based on the v17.2.2 source
+ code and implemented by Arvo ES1JA
+
+- displaying country name/prefix is aligned
+
+- notification filters are implemented and improved for all possible standard messages
+
+- now it is possible to apply striked/underlined 'worked B4' notifications to the standard messages other
+  than containing 'CQ' or 'MyCall'. This functionality may be switched on/off by user.
+
+__________________________________
+
+ JTDX v17.3.2  - is based on v17.3.1 source code, vast majority of the changes made by Arvo ES1JA
+
+- fixed bug of new DXCC notification if there is no user callsign set in the settings
+
+- fixed defect that allowed to check in 'Show prefix not name' box if 'Show DXCC names' is not checked
+
+- more filters added to prevent 'New one ' criteria being triggered by the free text messages
+
+- deleted checkboxes for setting striked/underlined 'Worked B4' notifications for other than CQ/MyCall
+  standard messages
+
+- changed color notifications for other than CQ/MyCall standard messages from background color to the text
+  color. Now all checks setting the same attribute: either background color or text color.
+
+- some changes for 'Bold' font attribute usage: now all 'New ' criteria checks setting 'Bold' attribute for 
+  decoded text message, if any criterion is met
+
+- added QSO counter in the status bar, at right bottom corner of the user interface. wsjtx_log.adi being 
+  used to count JT65/JT9 contacts.
+
+- added date for every decoded message in the ALL.TXT file. It shall simplify searching for any QSO missed
+  in the logbook.
+
+  It is not recommended to set 'Bold' attribute in the decoded text font settings(Settings->General tab),
+  as 'Bold' attribute being used in the 'New one ' notification functionality.
+
+__________________________________
+
+ JTDX v17.4  is based on the v17.3.2 source code
+
+- all FTRSD false decode filters reworked and moved as block close to the FTRSD decoder, allowing to attempt
+  decode candidate with Hint decoders if decoded message is considered as the false one
+
+- implemented AGC compensation functionality, where noise level change triggered by AGC operation in the receiver
+  being compensated in JTDX software, bringing improved decoding efficiency while AGC is in operation.
+  AGCc button is implemented in main user interface to turn ON/OFF this functionality. 
+  This button shall be turned off by user if JT signals are not strong enough to trigger AGC or if 
+  AGC is turned OFF in the receiver.
+
+- most of the checkings for the false FTRSD decode now based on information from the ALLCALL.TXT file.
+  This file is installed into /bin/data/ path by the JTDX v17.4 installer and has a list of callsigns spotted
+  in JT modes for last couple years. CALL3.TXT file being now mostly used for Hint decoders operation and 
+  containig data from JT spots of the last months.
+
+- 'New one' notification functionality is modified: added preview pane in the Notifications tab of the settings.
+   It has simplified notification color settings. This functionality is designed and implemented 
+   by Arvo ES1JA.
+
+- decoded message windows now have table format. Special cell with red color background being used now
+  for additional notification for decoded messages containing MyCall. It makes easier to recognise decoded
+  messages if somebody responding to user outside of the RX frequency.  
+
+- now user can send QSO data to the eQSL server. Configuration settings are added to the Reporting tab.
+  This functionality is implemented by Arvo ES1JA and may be switched ON/OFF by user.
+
+- introduced independent notification funcationality per band and per mode. This functionality is 
+  designed and implemented by Arvo ES1JA.
+
+- implemented selective DXCall Hint decoders activation based on the last transmitted message.
+  This feature has reduced number of the false Hint decodes on RX frequency during the QSO.
+
+- applied +-0.2 second DT window to most of the DXCall Hint decoders, centered to DT value of the last decoded
+  signal. This functionality has reduced number of the false Hint decodes on RX frequency during the QSO.
+
+- CQ/CQ DX DXCall Hint decoder is splitted to two decoders: one is for CQ, other is for CQ DX message.
+  Temporarily suppressed sensitivity of the CQ DX message DXCall Hint decoder, planning to finish this
+  functionality in the next JTDX version.
+
+- new DXCall Hint decoder is introduced for 'MyCall + HisCall + GRID' message, just in case of retransmission 
+  of this message during the QSO. Now JTDX v17.4 has got twelve Hint decoders.
+
+- now SRAND random number generator is used in FTRSD decoder for any signal candidate coming with SNR 
+  less than -24dB. Combined with several decoding passes, SRAND usage has increased decoding efficiency 
+  of the weak signals.
+
+- expanded DECODE button usage to decode again the JT9 signals, that might be used while switching ON/OFF AGCc
+  button.
+__________________________________
+
+ JTDX v17.5  is based on the v17.4 source code
+
+- memory allocation is reworked for the large arrays of JT65 and JT9 signals
+
+- defects fixed: ALLCALL.TXT file allocation for MAc OS-X and Linux builds, several bugs in the 'notifications'
+  functionality, wrong GRID square indication in DX Grid window if any other callsign's report/RRR/73 message 
+  is clicked, wrong country name displaying for free text messages containing TU73, in notification about loss
+  of connection to the eQSL server, wrong interval time displaying if JT9 messages decoded again using Decode
+  button, added extra notification about copying CALL3.TXT file to the log directory, bug of displaying messages
+  with internally used 'CF00' Grid square in the wideband experience based Hint decoder, callsign truncation to
+  5 characters at displaying of the decoded WSPR messages, withdrawn 13-character limitation in Configuration
+  line edit for macros entry, truncation of text on labels in the main interface status bar, alignment of messages 
+  color background in the RX frequency window
+
+- modified main window UI1 and Configuration UI, added link to JTDX Web page in the Help
+
+- configurable automatic clearance of DXCall DXGrid upon exit from JTDX is added for UR5EQF logbook software users
+
+- added beep notification on the first decoded message in the RX interval
+
+- added combobox color notification if text message length in the Free text message combobox is exceeded 13 (for 
+  free message) and 17 (for directional CQ message with 6-character callsign) characters
+
+- added background color notification about current minute and TX ODD/EVEN checkbox settings
+
+- reworked wideband previous intevals data based Hint decoder, it is made as selective one to the expected message
+  and internally splitted to 6 focused decoders. In result is reduced number of the false Hint decodes.
+  Total number of Hint decoder subroutines in v17.5 is 11, total number of the Hint decoders now is 16.  
+
+- reworked DXCall/DXGrid based Hint decoder of the CQ messages, now any directional CQ message being supported 
+  in this decoder
+
+- FTRSD and wideband CQ/CQ DX messages Hint decoders bypass is applied, if SNR of the candidate signal is less
+  than -30.0dB SNR. A bit decreased time of decoding and number of the false Hint decodes. 
+
+- For BM/FTRSD decoder is added three more decoding passes focused on the QSO RX frequency (bandwidth is +-3Hz),
+  time to frequency domain conversion and candidate list renew being used for each of these decoding passes, up
+  to two candidates in the list per each decoding pass.
+  This functionality is applied after the first wideband decoding pass and may not be turned OFF, only BM/FTRSD
+  decoder being involved in this functionality, decoding efficiency is optimized. 
+  User can set number of RX frequency decoding attempts for the new RX frequency decoding passes in the Advanced
+  tab. There is solid increase in FTRSD decoding efficiency of the weak signals on the RX frequency for minimum 
+  number of the decoding attempts set in Advanced tab.
+  With this functionality JTDX may decode up to 7 signals on the QSO RX frequency.
+
+- changed bandwidth for noise part of SNR calculation from approximately 560 to 180Hz, SNR is recalibrated using
+  simulated signals from .wav files
+
+- <eQSL_QSL_SENT:1>Y being added to the wsjtx_log.adi file if QSO data is sent to eQSL server, waiting for response
+  from the eQSL server is increased to 10 seconds
+
+__________________________________
+
+ JTDX v17.5.1 is based on the v17.5 source code
+
+- recovered AGCc functionality that is broken in v17.5
+
+- added notification for possibly false FTRSD decoded standard messages: questionmark with yellow background, right
+  after the message. Such messages being blocked for sending to the pskreporter.info server.
+
+__________________________________
+
+ JTDX v17.5.2 is based on the v17.5.1 source code
+
+- some WSJT-X patches are applied: 6581,6588,6589,6590,6597,6599,6618,6622,6636,6650,6651,6658,6659,6660,6661,6703,
+  6705,6750,6755,6766,7030,7031,7032,7038,7039,7122,7124,7130,7293,7320,7390,7357,7457
+
+- skipped audio .wav files recording to HDD if user selected 'Save -> None'
+
+- reworked anti-aliasing filter for 48000 -> 12000 Hz sampling rate conversion of the RX signal
+
+- decoded standard messages for worked DXCC/Grid square/Callsign may now be skipped in the decoded messages window 
+  using new control checkbox 'Don't show it' in the Notifications tab. This functionality may be applied to CQ messages
+  by default and to other standard messages if 'Check other standard messages' checkbox is checked there.
+
+- updated Hamlib to the latest version
+
+- several changes done to prevent dupe Hint decodes appear in the decoded message window
+
+- software development kit is changed from Qt 5.2 to Qt 5.5. There now more fonts available in the JTDX drop down menu, 
+  also decreased size of the JTDX installation package. Those users who building JTDX themselves under MS Windows shall 
+  now switch Qt environment using commands 'enable-qt55' and 'build-hamlib3'.
+
+- KG4W callsign is added to cty.dat file VA, USA
+
+- added combobox color notification if text message length in the tx5 message combobox, tab 1 of QSO messages, is 
+  exceeded 13 (for free message) and 17 (for directional CQ message with 6-character callsign) characters
+
+- fixed bug in Filter functionality: in previous versions left mouse button double click on the waterfall caused whole
+  JT65 frequency range decoding instead of the 400 Hz.
+
+- several criteria are applied to prevent false CQ Hint decodes in presence of the strong JT65 signal on the band
+
+__________________________________
+ 
+ JTDX v17.5.2-SWL  is based on the v17.5.2 source code
+
+- expanded JT65 SNR reporting range from -35 to +35dB, SNR levels calibrated up to +35dB using simulated
+  .wav audio files
+
+- banned transmission of the messages, as JT65-HF software does not support reception of messages
+  with reports in the extended range
+
+__________________________________
+ 
+ JTDX v17.6  is based on the v17.5.2 source code
+
+ATTENTION: built v17.6 package has shifted dynamic range towards weak signals and superior performance in weak
+signal decoding by FTRSD at poor propagation conditions if there are less than 12 signals on the band.
+Top part of dynamic range will be addressed in v17.6.1 where the same source code will be used, difference only 
+in the specific build. So far we do not know why dynamic range being shifted at specific build. 
+
+- fixed bug of color inversion in the notification functionality, occured if there is not any checking 
+  criterion chose.
+
+- fixed bug where TX mode was changed if there other mode signal is decoded on the RX frequency
+
+- fully dynamic decoding attempts recalculation based on the remaining number of candidates per each wideband 
+  decoding pass. It has brought some more efficiency for weak signals decoding by FTRSD if there are few signals 
+  on the band.
+
+- 'hide messages from continents' functionality: it is some kind of the virtual DX window where local signals may
+  being not shown. Effectevily reducing information overloading to user.
+
+- 'beep on the wanted callsign' functionality: it will let user to avoid continious visual screen monitoring, 
+  replacing it with the sound notification. System sound being used from default playback device set in 
+  the operating system. At the moment callsign lenght is limited to 6 characters. Rest of any decoded message 
+  shown on the screen being checked for the wanted callsign. 
+
+- some improvement of the AGC compensation functionality for JT65 signal decoding
+
+- changes in the mainwindow interface: TX odd/even checkbox is replaced with the button, more suitable allocation 
+  is chose for it.
+
+- now JTDX does support up to 200 JT65 decoded messages
+
+- two frequency mask decoding passes added. Frequency mask being derived from the first decoding pass.
+  Frequency mask decoding is enabled in the code by default, depending on number of the signals on the band 
+  software making decision to turn it OFF (software does recognize band conditions and frequency mask decoding 
+  can be automatically turned off if there are too many signals on the band). New setting in the Advanced tab 
+  does prohibit turning frequency mask decoding passes OFF, it makes some benefit for overloaded band scenario 
+  and shall be used if user has fast CPU.
+
+- 'bad data' diagnostic print is replaced with 'audio gap detected'. In such scenario some sample being filled with
+  1.0 value and software attempting to decode this RX interval. It was not allowed in the previous JTDX versions. 
+
+- reduced number of calculations and expanded time range for weak level of the input signal detection.
+  Diagnostic print 'low rms' is replaced with the 'input signal low rms', as in the previous JTDX versions such RX
+  interval being not passed to the decoders.
+
+- increased number of processed records: up to 40k in file ALLCALL.TXT and up to 35k in file CALL3.TXT
+
+- updated in software file ALLCALL.TXT. There is new CALL3.TXT being supplied along with the software package, this
+  new file is not compatible with JTDX software versions earlier than v17.6.
+
+- changed type of data in the large Hint arrays from 4 bytes to the 1 byte. It has allowed to decrease allocated 
+  memory volume caused by the CALL3 file extension.
+
+- audio buffer size is changed in software: for input signal from 100ms to 2 seconds, for output signals from 1 to 
+  2 seconds
+
+- top frequency border for JT65 signal decoding is increased from 2700Hz to 3000Hz
+
+__________________________________
+
+ JTDX v17.6.1  is based on the v17.6 source code
+
+v17.6.1 has effective JT65 signals decoding in overcrowded band conditions. v17.6 has better sensitivity for weak 
+signal decoding in low populated band conditions versus v17.6.1. There are two possible reasons to make upgrade 
+from v17.6 to v17.6.1: if user has slow CPU and can not use frequency mask decoding, or user need to fix bugs 
+described below. Also both version can be used on the same computer if installed in the different folders. 
+
+- fixed bug in inverse color notifications for other standard messages
+
+- fixed bug in distance calculation for grid QTH square on the same longtitude: applied WSJT-X patch r7045.
+
+__________________________________
+
+ JTDX v17.7  is based on the v17.6.1 source code
+
+- there is a gap at 1-st second of input data under Windows XP, source code is changed to fill in
+  this gap and to prevent 'audio gap detected' diagnostic message to appear on the screen in this
+  scenario
+
+- now JTDX works with no CALL3.TXT file,  while there some functionality will be missed
+  in Hint decoders and recognition of the false FTRSD decodes if CALL3 file is missed. There are
+  up to 4 reminders to copy CALL3.TXT file to the log directory after each start of the JTDX
+  software, each reminder being triggered by various parts of the source code.   
+
+- changed program's icon and installation logo
+
+- added waterfall graphics for Filter button
+
+- increased allowed length from 'beep on wanted callsign' to 11 characters
+
+- added validators for DX Call, DX Grid and wanted callsign windows line edit
+
+- changes for the signal meter: range expanded to 90dB, measuring peak values 
+  rather than rms, color being changed for too weak or too strong signal.
+  Signal meter indication now allowing user to match input signal dynamic range 
+  with ADC dynamic range and JTDX dynamic range, also can be used to evaluate noise level 
+  of the sound card's input.
+
+- RX gain slider deleted from main user interface.
+
+- new 'Filter' tab in configuration user interface
+
+- added 'hide free messages' filter option for non RX frequency 
+
+- reduced minimal size and changed proportions for large size of the main user interface
+
+- redistributed number of decoding attempts for Advanced tab settings 'Number of decoding attempts' =1 or =2, 
+  users with these settings will get more weak signals decoded in comparison to v17.6
+
+- fixed bugs: wrong UTC at decoding again in JT9 mode (Decode button usage),
+  prolonged decoding at decoding again in JT9 mode (Decode button usage)
+
+- increased decoding efficiency of JT9 Fano decoder at RX frequency: more decoding attempts being used
+
+- decoding JT9 again: for TX mode = JT9 pushing Decode button triggering attempt to decode JT9 signal 
+  on RX frequency again with more decoding attempts being used, bringing the best decoding efficiency. 
+  Decoding bandwith is +-2 Hz relatively to the RX frequency, number of candidates is limited to 2.
+
+- changed 'decode again' logic: if TX mode is set to JT9 then JT65 decoder will be bypassed, 
+  if TX mode is set to JT65 then JT9 decoder will be bypassed
+
+- enabled decoding at rest of RX interval: decoding after late start of JTDX, decoding 
+  after the halted TX in the same minute interval. Threshold is set to 35th second of the minute 
+  interval and it is still possible to decode -01dB SNR JT65 signals from remaining 12 seconds 
+  of message transmission. Band change: if it is changed after 12th and prior 35th second of 
+  an RX interval then signals from both bands will be decoded, if it is changed after 35th second 
+  of an RX interval then signals from previous band will be decoded.
+
+- added new 20m subband in selection for shared JT65/JT9 operation from 14080 to 14085 KHz.
+
+__________________________________
+
+ JTDX v17.8  is based on the v17.7 source code
+
+- fixed bug: dupe JT9 message shall not be passed to the decoded text window if delta frequency between 
+  these signals is less than 17 Hz
+
+- JT9 decode again functionality with mouse's left button double click now triggering decoding of
+  JT9 signals in frequency span +- 20Hz from frequency selected on the waterfall
+
+- implemented message text filters that will allow to show only 'CQ' or 'CQ, RRR, RR73, 73' messages
+  in the decoded text window. New filters do not process messages with 'MyCall'.  New text filters can
+  be activated in the 'Filters' tab of settings
+
+- ALLCALL.TXT file is updated, CALL3.TXT file as of 31.03.2017 is supplied together with the software package
+
+- implemented band scheduler functionality, now user can schedule band switching in transceiver. 
+  Antenna switching is not supported in JTDX, band scheduler will not change band if 'Enable TX' button
+  is active. Up to five band can be scheduled, functionality can be activated in the 'Scheduler' tab of
+  settings.
+
+- possibly false JT65 FTRSD decoded messages now can be forbidden for transmission via UDP to external
+  software, for instance to JTAlert, reducing number of the false sound notifications and number of the
+  false spots being sent to the hamspots.net server. This functionality is turned on by default and 
+  can be deactivated by user in 'Reporting' tab of the settings.
+
+- ramp is implemented in modulator for first tone of transmission, it should reduce interference 
+  at beginning of the minute interval
+  
+- JT10 mode is implemented with sensitivity threshold close to -28dB SNR. Coding is taken from JT9 mode,
+  modulation is modified: two lower tones are used for SYNC vector, 8 upper tones are used for message data, 
+  frequency bin (tone) width is around 1.7 Hz, minimal distance between two neighbouring tones 
+  is around 6.9 Hz, occupied bandwidth is around 65 Hz, message transmission takes close to 49 seconds.
+  'Filter' button limits decoding bandwidth to 160 Hz, software will try to decode any JT10 signal with SYNC 
+   vector located inside this bandwidth.
+  JT10 mode being considered as alternative to JT65A, with benefits of sensitivity, spectra density and 
+  resistance to the Doppler frequency spreading.  
+  Signal subtraction and Hint decoding is not yet supported for JT10 mode.
+
+- 14080..14085 KHz subband, assigned in v17.7 for shared JT65/JT9 operation, now is reallocated to JT10.
+
+   There are two timers implemented to limit JT10 decoding time: 12 seconds for on air operation and 30
+seconds for SWL mode. JT10 candidate list being ranked by SYNC power, strongest signals will be decoded
+first, there are up to 200 candidates allowed in the list. Remaining in the list candidates will be 
+dropped if decoding timer is expired.
+
+Decoding again functionality of JT9/JT10 signals is different from JT65A one: +-3 Hz frequency
+span being used if 'Decode' button is pressed, +- 20 Hz frequency span being used if user double clicking 
+by mouse's left button on the waterfall. Software using this span to look for the SYNC pattern. 
+
+__________________________________
+
+ JTDX v17.9  is based on the v17.8 source code
+
+- JT10 mode is renamed to T10 (stands for 'tonal 10')
+
+- fixed bug: there were dupe decoded messages of the strong T10 signals. Now 45 Hz distance is 
+  being used to ban dupe T10 decoded messages
+
+- two pass decoding with signal subtraction is implemented to T10 and JT9 modes
+
+- fixed bug in T10 and JT9 message generators, 69th(last) data tone there was corrupted
+
+- five QSO RX grequency Hint decoders implemented to T10 and JT9 modes:
+  DXCall based decoders for messages: 'MyCall HisCall Grid', report, R+report and RRR/RR73/73
+  CALL3 based decoder for message: 'MyCall HisCall Grid'.
+  DT range from -0.5 to +1.5 second and frequency span +-2 Hz is applied to all QSO RX frequency T10/JT9
+  Hint decoders
+
+- T10 decoding passes timer is changed to 5+5 seconds
+
+- TCP client is implemented to pass QSO data in single ADIF string to the external logbook software. 
+  Connection to DXKeeper, N1MM and Logger32 logbook software is being supported. 
+  TCP client can be configured and activated in Reporting tab of the settings. 
+
+- user defined frequency ceiling is added to JT65 decoder and Advanced tab of the settings is updated 
+  with the new parameter, by default it is set to 3000 Hz
+
+- Hamlib version is updated (as of June 3rd, 2017)
+
+- fixed bug: signal report was extracted from last of the several decoded messages having 'MyCall' 
+  in the current time interval, now message with HisCall (DxCall) being used for signal report extraction
+
+- added new functionality: left mouse button double click on any 'MyCall HisCall (R)report' decoded message 
+  triggering extraction of the signal report
+
+- 30MHz limit is withdrawn for recording frequency changes into ALL.TXT file if 'TX frequency 
+  changes is not allowed while transmitting' in general tab of the settings
+
+- ALLCALL.TXT file is updated, version as of June 12th, 2017
+
+- fixed bugs where change of band or mode in the current RX interval triggered early additional decoding 
+  and
+  Halt TX then TX message change and continue TX, triggered early decoding in the next interval
+
+- wsjtx_log.adi file processing is changed to accept multistring structure for single QSO record.
+  Now ADIF export from DX4WIN logbook can be added into wsjtx_log.adi file
+
+__________________________________
+
+ JTDX v18.0  is based on the v17.9 source code
+
+- JT9 signal decoding efficiency is improved in JT9 mode and combined JT9+JT65 mode.
+  Single JT9 mode of operation has the best JT9 signal decoding efficiency.
+
+- bandpass Filter and SWL functionality is implemented to the standalone JT9 mode. 
+  Filter has 100 Hz bandwidth and is dedicated for usage with slow CPUs.
+
+- Bins/Pixel and NAvg waterfall UI settings now do not affect gain of signal on the waterfall
+
+- if 'Lock TX=RX' is unchecked, mouse's right button click will set TX frequency while RX frequency 
+  will not be changed. Now there are three options to control frequency by mouse on the waterfall 
+  when 'Lock TX=RX' checkbox is unchecked:
+	- click of left mouse button will set RX frequency
+	- CTRL button + mouse left button click will set TX and RX frequencies
+	- click of right mouse button will set TX frequency
+
+- minor bug fixed in JT9/T10 Hint decoders where there was possible to decode 'mycall 73' 
+  message if DxCall window was cleared
+
+- AGCc functionality is reworked. Now there is a little infulence of AGC compensation functionality 
+  on the decoding efficiency if AGC is not triggered in the receiver.
+
+- waterfall signal scaling implemented, it eliminates AGC noise step on the waterfall
+
+- srand number generator in FTRSD decoder is replaced with rand number generator where seed 
+  number is unique per each decoding pass. Now decoding again of the same wav file or interval 
+  shall give more or less equal results.
+
+- decoding of 2nd and 3rd JT65A harmonics is implemented with optional diagnostic 
+  print of the decoded message. Depth of harmonics decoding can be set in Advanced tab of the Settings 
+  where depth = 0 means there is no decoding of the harmonics, diagnostic print can be turned on/off 
+  in Misc tab of the main UI window.
+
+- hide main window menus and hide waterfall controls functionality is implemented basing on the WSJT-X code.
+  Main window UI got 'Menus' checkbox, widegraph UI got 'Controls' checkbox.
+
+- subtraction of decoded JT65 signals-harmonics is implemented, this functionality can improve JT65 signal
+  decoding efficiency. 
+
+- user defined timer is implemented to eQSL sending, it can be set in Reporting tab of the settings
+
+- implemented bypass of all message filters, it can be turned on/off in Misc tab of the main UI 
+
+- implemented bypass of all message filters for RX frequency of QSO, it can be turned on/off in 
+  Misc tab of the main UI. Also bypass of RX frequency text filters is being triggered now if operator using 
+  Decode button or double click on waterfall to decode again last interval or audio wav file
+
+- main window popup functionality is implemented, it has no connection to 'beep' notification functionality now
+  and user can control it via Misc tab
+
+- 'beep'/system sound notification is being used once per decoded interval now. As there is possible to assign 
+  melody in Windows OS to system sound multiple 'beep' sounds per interval caused audio chaos while overlapping 
+  with each other.
+
+- executable file name is changed from wsjtx.exe to jtdx.exe, jt9.exe process name is changed to jtdxjt9.exe.
+  This change can let user to run JTDX and WSJT-X concurrently with no need in the rig-name key.
+  JTAlert version 2.10.4 does support old and new JTDX executable names via user's selection in the settings.
+
+- gray vertical marker line is implemented in plotter(waterfall) window to show top JT65 decoding frequency 
+  set in Advanced tab ot the settings
+
+- in JT9+JT65 combined mode gray horizontal line in plotter (waterfall) now will now show user if top JT65 
+  decoding frequency is set by mistake or intentionally below the bottom JT9 decoding frequency, area where 
+  software can not decode any signal is marked by the gray line
+
+- transition from JT65 to JT9 and back to JT65 mode is simplified in JT9+JT65 combined mode if 'Lock Tx=Rx' 
+  is not checked. Left and right mouse buttons (Rx and Tx frequency setting) and waterfall are being used 
+  in this functionality.
+
+  Let's say we are in JT65 band:  top JT65 decoding frequency from advanced tab of the Settings is being used 
+  as threshold, if we setting on the waterfall Rx (or Tx) frequency above the top JT65 decoding frequency then 
+  TX mode will be changed to JT9 and Tx (or Rx) frequency will be set equal to the chosen Rx (or Tx) frequency.
+
+  There is JT65/JT9 frequency splitter from the watefall settings is being used as threshold for transition 
+  from JT9 to JT65 mode, so we have gap where  transition will not be triggered. If in settings JT65/JT9 
+  splitter is set to 2400 Hz and top JT65 decoding frequency set to 2700 Hz, there is 300Hz gap where this 
+  functionality will not be working. 
+
+- 'Auto TX' and 'Disable TX after 73' checkboxes moved from General tab of the settings to main window UI 
+  as push buttons
+
+- position of decoded messages windows vertical splitter is being stored now in JTDX.INI
+
+- short message sequencing scenarios functionality is implemented and can be controlled via Sequencing tab 
+  of the settings:
+
+	- 'Halt Tx if operator I called answered to other operator' functionality, is active by default.
+          This functionality will Halt Tx if decoded standard message is addressed to other operator and
+	  has report or QTH locator inside.
+
+	- 'Come back to calling CQ if there is no answer to report message decoded N times' functiînality.
+	  It can be used in calling CQ scenario and will trigger CQ message if counter has reached value N.
+
+	- 'Halt TX if report message to me is not decoded after N transmissions' functionality. Can be used
+	  replying to someone's CQ scenario, it will halt TX if transmissions counter has reached value N 
+          and report message is not decoded.
+  
+	- 'Halt TX if the same report message was received N times' functionality. It is designed to stop
+	  transmission if the same report message being received in the loop. It can be useful if other QSO
+	  party operator can not decode a message addressed to him or left his software unattended.
+ 
+	- 'Halt TX if the same RRR/RR73/73 message was received N times' functionality. It is designed to stop
+	  transmission if the same RRR/RR73/73 message being received in the loop. It can be useful if other QSO
+	  party operator can not decode a message addressed to him or left his software unattended.
+
+- two defects fixed: AF frequency jump for T10 to JT9 mode transition and failure to set appropriate 
+  band/VFO frequency for transition between WSPR and JT65/JT9+JT65 modes
+
+- dual message (RRR+CQ or RR73+CQ) TX is implemented, right button of mouse can be used to control it by clicking 
+  on RRR/RR73 button in QSO messages tab 2. Dual message TX is being toggled by right button of the mouse.
+  This functionality can be used in JT65 mode if user received report better than -10dB SNR from other QSO party
+  operator. Each message signal takes half of the transmission interval, getting approximately 50% error rate while being
+  transmitted.
+
+- optional automatic QSO logging functionality is implemented, it can be activated in Reporting tab of the settings 
+  as alternative selection to 'Prompt me to log QSO'. Also it can be unchecked to get into manual QSO logging mode.
+
+- DX Call window text will get green color background after QSO is logged, as a reminder at manual logging 
+  and indicator of success for automatic QSO logging
+
+- callsign checking is added for logging: in previous versions software did not prompt to log QSO at last TX  message 
+  if two consecutive RRR/RR73/73 messages were transmitted with different QSO party callsign, now we getting either 
+  prompt or automatic logging for this scenario
+
+- default RX ceiling frequency for JT65 mode is changed from 3000Hz to 2700Hz
+
+- optional 'show messages with my call in RX frequency window' functionality is implemented. It can be toggled 
+  in Misc tab of the main window UI, by default it is turned on.
+
+- improved detection of 'my call in decoded message' for notifications functionality
+
+- 'Clear DX call and grid after logging' functionality is modified: in manual sequencing operation mode a timer 
+  is implemented there to clean up DX Call and DX Grid windows at end of the interval where QSO is logged
+
+- QSO time on / time off functionality is added while logging QSO, UDP data exchange is updated accordingly.
+  QSO time on / time off recognition accuracy is improved.  
+
+- processing of some wrong sequences of the standard messages is now being supported in manual and autosequencing 
+  mode of operation:
+
+	- scenario where 'CQ' message is answered by the 'ROGER+REPORT' message, it will
+	  trigger 'ROGER+REPORT' message transmission
+	- scenario where 'replying to CQ with grid' message is answered by the 'ROGER+REPORT' message, it will
+	  trigger 'ROGER+REPORT' message transmission
+	- scenario where 'REPORT' message is answered by 'REPORT' message, it will trigger 'RRR/RR73' message
+	  transmission
+
+- optional semi-autosequencing mode of operation is implemented to JT65/JT9/T10 modes. User have to choose by mouse 
+  the decoded message for QSO in 'calling CQ' or 'replying to CQ' scenario, then autosequencing will automatically 
+  generate required messages to continue and finish this QSO. In 'calling CQ' scenario autosequencing will continue 
+  to call CQ after the QSO is finished, in 'replying to CQ' scenario it will disable TX after the QSO is finished.
+
+  Autosequencing mode can be toggled with AutoSeq button in the main window UI.
+
+  Autosequencing mode of operation can be used together with auto logging mode and short message sequencing scenarios
+  functionality configured in the Sequencing tab of the settings with exception to the 'Halt TX if the same RRR/RR73/73 
+  message was received N times' which is not supported in the autosequencing mode. 
+
+  Standard type of messages is being processed by autosequencing on any frequency, while at end of QSO 
+  reception/processing of some addressed free messages is supported if it does contain callsign and '73'. For instance 
+  received messages like "UA1AAA TNX 73", "UA1AAA HNY73", "UA1AAA73MXMAS" can be processed by AutoSeq at end of QSO 
+  and responded with '73' standard message.
+
+  Also autosequencing can process unaddressed free message at end of QSO if it is received on the RX frequency of QSO 
+  and containing '73' inside. For instance message like '15W 3EL TU73' can be processed and responded with '73' 
+  standard message.
+
+- latest version of Hamlib 3.2 was used to build JTDX v18.0.0.133 installation package for MS Windows OS
+
+__________________________________
+
+Clicking by mouse (AGCc ON/OFF + Decode) or (SWL ON/OFF + Decode) or (Filter ON/OFF + Decode) or (Hint ON/OFF + Decode) sequence 
+triggering one more attempt to decode latest interval.
+__________________________________
+
+-26/-28/-29/-31dB SNR JT65 simulated files can be shared upon email request.
+
+SNR calibration wav files are published there:
+https://cloud.mail.ru/public/B5Dz/5m6PQ4fNi
+__________________________________
+Test results, JT65a, number of decoding attempts=1, decoding passes=4:
+
+Wideband experience based Hint decoder
+test Web SDR audio files https://cloud.mail.ru/public/LrVm/zEkJ1ZVLg
+CALL3.TXT file as of November 2nd, 2016, 21570 records
+
+SW version / total JT65 decodes / BM-FTRSD decodes / wideband CQ/CQ DX Hint / experience based Hint / JT9 /
+v17.2 Hint OFF / 3087  / 3087  / -  / -  /
+v17.2 Hint ON  / 3296  / 3055  / 61* / 180* / -  /
+v17.3 Hint ON  / 3315  / 3028  / 94* / 193* / -  /
+v17.4 Hint OFF / 3123  / 3123  / -  / -  / 374  /   # AGCc is OFF
+v17.4 Hint OFF / 3162  / 3162  / -  / -  / 378  /   # AGCc is ON
+v17.4 Hint ON  / 3355  / 3064  /  98 / 193 / -  /   # AGCc is OFF
+v17.4 Hint ON  / 3432  / 3083  / 127 / 222 / -  /   # AGCc is ON
+v17.5 Hint ON  / 3332  / 3060  / 100 / 172 / -  /   # AGCc is OFF
+
+v17.6 Hint OFF / 3118  / 3118  / -  / -  / 374  /   # AGCc is OFF frequency mask is OFF
+v17.6 Hint OFF / 3158  / 3158  / -  / -  / 377  /   # AGCc is ON frequency mask is OFF
+v17.6 Hint OFF / 3174  / 3174  / -  / -  / 377  /   # AGCc is ON frequency mask is ON
+
+*it is not possible to confirm every hinted CQ/CQ DX decode from these
+SDR audio files is correct one.
+-----------------------
+
+Wideband CQ messages Hint decoder, -28dB SNR files, CALL3.TXT based:
+
+v16.4   37.5%  --- CALL3.TXT/20480 records
+v16.6   37.3%  --- CALL3.TXT/20480 records
+v16.7   36.1%  --- CALL3.TXT/20480 records
+v16.8   37.9%  --- CALL3.TXT/20480 records
+v16.9   38.4%  --- CALL3.TXT/20480 records
+v16.9.1 39.5%  --- CALL3.TXT/20480 records
+v17.0.1 37.6%  --- CALL3.TXT/21570 records
+v17.1   37.8%  --- CALL3.TXT/21570 records
+v17.2   37.9%  --- CALL3.TXT/21570 records 
+v17.3   38.4%  --- CALL3.TXT/21570 records  only hintwidecq. hintwidedx decoders, others bypassed
+v17.4   38.7%  --- CALL3.TXT/21570 records  only hintwidecq. hintwidedx decoders, others bypassed
+v17.4   89.6%  --- CALL3.TXT/21570 records  no test bypass used
+
+-----------------------
+
+Wideband CQ DX messages Hint decoder, -28dB SNR files, CALL3.TXT based:
+
+v16.4   36.4%  --- CALL3.TXT/20480 records
+v16.6   37.0%  --- CALL3.TXT/20480 records
+v16.7   35.0%  --- CALL3.TXT/20480 records
+v16.8   35.1%  --- CALL3.TXT/20480 records
+v16.9   36.4%  --- CALL3.TXT/20480 records
+v16.9.1 37.3%  --- CALL3.TXT/20480 records
+v17.0.1 35.9%  --- CALL3.TXT/21570 records
+v17.1   35.6%  --- CALL3.TXT/21570 records
+v17.2   36.1%  --- CALL3.TXT/21570 records
+v17.3   36.7%  --- CALL3.TXT/21570 records  only hintwidecq. hintwidedx decoders, others bypassed
+v17.4   36.6%  --- CALL3.TXT/21570 records  only hintwidecq. hintwidedx decoders, others bypassed
+v17.4   37.6%  --- CALL3.TXT/21570 records  no test bypass used
+-----------------------
+
+CALL3 based, QSO frequency hinted decoder, -29dB SNR simulated signals, 1000 files,
+decoding probability:
+
+v16.4   54.7%  --- CALL3.TXT/20480 records
+v16.6   54.7%  --- CALL3.TXT/20480 records
+v16.7   52.9%  --- CALL3.TXT/20480 records
+v16.8   56.0%  --- CALL3.TXT/20480 records
+v16.9   58.0%  --- CALL3.TXT/20480 records
+v16.9.1 59.0%  --- CALL3.TXT/20480 records
+v17.0.1 57.9%  --- CALL3.TXT/21570 records
+v17.1   58.0%  --- CALL3.TXT/21570 records
+v17.2   this decoder is obsolete starting from v17.2
+-----------------------
+
+CALL3 based, QSO frequency group of decoders, -29dB SNR simulated signals, 1000 files,
+decoding probability:
+
+'CQ hiscall hisgrid' message decoder
+v17.2   60.5%  --- CALL3.TXT/21570 records
+v17.3   60.3%  --- CALL3.TXT/21570 records
+
+'mycall hiscall hisgrid' message decoder
+v17.2   58.4%  --- CALL3.TXT/21570 records
+v17.3   63.9%  --- CALL3.TXT/21570 records
+
+'mycall hiscall report' message decoder
+v17.2   52.7%  --- CALL3.TXT/21570 records
+v17.3   this decoder is obsolete starting from v17.3
+-----------------------
+
+DX Call based, QSO frequency hinted decoder, -31dB SNR simulated signals, 1000 files,
+decoding probability:
+
+v16.4   36.2%
+v16.6   36.5%
+v16.7   33.6%
+v16.8   36.1%
+v16.9   40.2%
+v16.9.1 44.4%
+v17.0.1 43.4%
+v17.1   43.6%
+v17.2   43.7%
+v17.3   51.3% CQ/CQ DX messages decoder
+v17.4   52.6% CQ message decoder
+v17.4   56.7% 'MyCall + HisCall + GRID' message decoder
+-----------------------
+
+DX Call based, QSO frequency CQ/CQ DX messages decoder, -33dB SNR simulated signals, 1000 files,
+decoding probability:
+
+v17.3   10.5% 
+-----------------------
+
+DX Call based, QSO frequency CQ/CQ DX messages decoder, -35dB SNR simulated signals, 1000 files,
+decoding probability:
+
+v17.3   1.6% 
+-----------------------
+
+SDR audio files with more than 20 signals in each file, decoding test results:
+test files: https://cloud.mail.ru/public/9Dfk/xrP5GvfYR
+
+          correct/ false decodes
+v16.4 hint off   3172/6
+v16.6 hint off   3168/7
+v16.7 hint off   3189/9
+v16.8 hint off   3198/3
+v16.9 hint off   3214/6
+v16.9.1 hint off 3229/1
+v17.0.1 hint off 3230/2
+v17.1 hint off   3231/4
+v17.2 hint off   3232/5
+v17.3 hint off   3232/0
+v17.4 hint off   3228/1
+v17.5 hint off   3227/0
+v17.5.2 hint off 3231/1
+v17.6 hint off   3202/1 frequency mask is OFF
+v17.6 hint off   3231/2 frequency mask is ON
+v17.6.1 hint off 3225/4 frequency mask is OFF
+v17.6.1 hint off 3232/0 frequency mask is ON
+v17.7 hint off 3215/1 frequency mask is OFF
+v17.7 hint off 3238/3 frequency mask is ON
+v17.8 hint off 3222/3 frequency mask is OFF
+v17.8 hint off 3229/3 frequency mask is ON
+v17.9 hint off 3230/0 frequency mask is ON
+v18.0 hint off 3252/2 frequency mask is ON, Harmonics decoding depth = 3 
+
+v16.4 hint on    3248/4  *  --- CALL3.TXT/20480 records
+v16.6 hint on    3251/4  *  --- CALL3.TXT/20480 records
+v16.7 hint on    3272/9  *  --- CALL3.TXT/20480 records
+v16.8 hint on    3284/4  *  --- CALL3.TXT/20480 records
+v16.9 hint on    3300/7  *  --- CALL3.TXT/20480 records
+v16.9.1 hint on  3306/1  *  --- CALL3.TXT/20480 records
+v17.0.1 hint on  3304/1  *  --- CALL3.TXT/21570 records
+v17.1 hint on    3310/4  *  --- CALL3.TXT/21570 records
+v17.2 hint on    3354/3  *  --- CALL3.TXT/21570 records
+v17.3 hint on    3376/0  *  --- CALL3.TXT/21570 records
+v17.4 hint on    3372/0  *  --- CALL3.TXT/21570 records
+v17.5 hint on    3366/1  *  --- CALL3.TXT/21570 records
+v17.5.2 hint on  3361/3  *  --- CALL3.TXT/21570 records
+v17.6 hint on    3350/1  *  --- CALL3.TXT >25000 records frequency mask is OFF
+v17.6 hint on    3349/5  *  --- CALL3.TXT >25000 records frequency mask is ON
+v17.7 hint on    3354/2  *  --- CALL3.TXT >25000 records frequency mask is ON
+v17.8 hint on    3349/4  *  --- CALL3.TXT >25000 records frequency mask is ON
+
+for decoding attempts=3:
+v16.4 hint off  3218 total
+v16.6 hint off  3217 total
+          correct/ false decodes
+v16.7 hint off   3223/4
+v16.8 hint off   3225/1
+v16.9 hint off   3233/5
+v16.9.1 hint off 3247/5
+v17.0.1 hint off 3244/2
+v17.1 hint off   3255/1
+v17.2 hint off   3252/1
+v17.3 hint off   3256/0
+v17.4 hint off   3256/3
+v17.5 hint off   3250/3
+v17.5.2 hint off 3245/2
+v17.6 hint off   3244/2 frequency mask is OFF
+v17.6 hint off   3251/3 frequency mask is ON
+v17.7 hint off   3252/1 frequency mask is ON
+v17.8 hint off   3248/0 frequency mask is ON
+v17.9 hint off   3255/2 frequency mask is ON
+v18.0 hint off   3271/0 frequency mask is ON, Harmonics decoding depth = 3
+
+JT9 signals decoding:
+
+17.9 step53 JT9+JT65 mode 0-2400-3500Hz 526 decodes
+18.0.0.133  JT9+JT65 mode 0-2400-3500Hz 543 decodes
+18.0.0.133       JT9 mode 2400-3500Hz   559 decodes
+
+ 
+
+*it is not possible to confirm every hinted CQ/CQ DX decode from these
+SDR audio files is correct one.
+-----------------------
+
+FTRSD weak signal decoding, -25dB SNR simulated signals, 10 signals in each file, 
+200 files used for test, all signals are out of RX frequency, decoding probability:
+test files: https://cloud.mail.ru/public/7SYw/BNWYg6hTJ
+
+v16.4 hint off   17.0%
+v16.6 hint off   17.4%
+v16.7 hint off   16.1%
+v16.8 hint off   17.1%
+v16.9 hint off   16.8%
+v16.9.1 hint off 16.3%
+v17.0.1 hint off 16.0%
+v17.1 hint off   21.1%
+v17.2 hint off   21.6%
+v17.3 hint off   21.4%
+v17.4 hint off   23.0%  # AGCc is OFF
+v17.4 hint off   21.6%  # AGCc is ON
+v17.5 hint off   23.2%  # AGCc is OFF
+v17.5.2 hint off 22.1%  # AGCc is OFF
+v17.6 hint off   34.4%  # AGCc is OFF frequency mask is OFF
+v17.6.1 hint off 32.6%  # AGCc is OFF frequency mask is OFF
+v17.7 hint off   38.0%  # AGCc is OFF frequency mask is OFF
+v17.8 hint off   38.3%  # AGCc is OFF frequency mask is OFF
+-----------------------
+
+FTRSD weak signal decoding, -25dB SNR simulated signals, 10 signals in each file, 
+200 files used for test, decoding on the QSO frequency 1000Hz, decoding probability:
+test files: https://cloud.mail.ru/public/7SYw/BNWYg6hTJ
+
+v16.8 hint off   20.0%
+v16.9 hint off   24.0%
+v16.9.1 hint off 24.0%
+v17.0.1 hint off 27.0%
+v17.1 hint off   28.0%
+v17.2 hint off   28.0%
+v17.3 hint off   28.0%
+v17.4 hint off   29.0%  # AGCc is OFF
+v17.4 hint off   28.0%  # AGCc is ON
+v17.5 hint off   50.0%  # AGCc is OFF
+v17.5.2 hint off 48.5%  # AGCc is OFF
+v17.6 hint off   51.0%  # AGCc is OFF frequency mask is OFF
+v17.6.1 hint off 48.0%  # AGCc is OFF frequency mask is OFF
+v17.7 hint off   52.0%  # AGCc is OFF frequency mask is OFF
+v17.8 hint off   53.0%  # AGCc is OFF frequency mask is OFF
+-----------------------
+
+JT9 weak signal decoding, -28dB SNR simulated signals, 1 signal in each file, 
+500 files used for test, decoding on the QSO RX frequency 2750Hz, decoding probability
+test files: https://cloud.mail.ru/public/Aabm/mis4SyF7z
+
+v17.6.1  8.6%
+v17.7   10.6%
+v17.7   12.2%  'decode again' using Decode button
+-----------------------
+
+T10 weak signal decoding, -28dB SNR simulated signals, 1 signal in each file, 
+500 files used for test, decoding on the QSO RX frequency 1500Hz, decoding probability
+test files: https://cloud.mail.ru/public/4t6v/tQ6ZFUBsD
+
+v17.8   8.6%
+
+v17.9  10.4%   *new set of files, QSO RX frequency 1750Hz, will upload to the cloud upon request   
+-----------------------
+
+T10 weak signal decoding, -26dB SNR simulated signals, 40 signals in each file, 
+50 files used for test, RX frequency set to 744 Hz, decoding probability
+test files: https://cloud.mail.ru/public/KdBH/k29mydxj9
+
+v17.8   81.6%
+-----------------------
+
+JT65 per pass decoding statistics, number of decodes, audio files with more than 20 signals 
+in the file, hint off:
+
+v16.1, number of decodes:
+pass 1 subpass 1    2502  80%
+pass 1 subpass 2     152   5%
+---
+pass 1 total        2654  85%
+pass 2               364  11%
+pass 3                95   3%
+pass 4                34   1%
+__________________________________
+
+Upgrade from  JTDX v17.x versions to JTDX v18.0 and backwards: 
+JTDX.INI file has different structure, it is recommended to delete old JTDX.INI
+Also it is recommended to use latest version of the CALL3.TXT file, this file is supplied with
+the software package. 
+
+Detailed instructions on how to delete JTDX.INI file are published there: 
+http://www.qrz.lt/ly3bg/JTDX/info/instal.html#notes
+
+Changing mode name for previously logged JT10 QSOs: in wsjtx_log.adi file using any text editor 
+replace  <mode:4>JT10   with   <mode:3>T10 
+PLEASE MAKE SURE YOU HAVE CREATED BACKUP COPY OF YOUR LOG FILE BEFORE MAKING CHANGES THERE.  
+__________________________________
+
+Compatibility of JTDX v18.0.0.133 with JTAlert software:
+
+JTDX v18.0.0.133 is being supported by JTAlert v2.10.4.
+Please select in the JTAlert settings 'jtdx.exe' as process name to let it work with JTDX.
+Since default setting is 'wsjtx.exe' JTAlert can not start with JTDX sofware at first time, 
+WSJT-X + JTAlert software pair can be used to get to JTAlert settings.  
+__________________________________
+
+Recommended settings:
+
+- AGCc button: use it only if AGC being triggered in receiver by JT signals at beginning of the RX interval.
+  Noise level change in the waterfall might be used as criterion showing that AGC is triggered in the receiver. 
+- Hint button: use it to decode signals on the QSO frequency and for wideband hinted decoding of the CQ messages
+- Clean DX, use it to clean DX Call DX Grid windows if data there is not required, this way user
+  could avoid some false hinted decodes  
+
+Advanced settings tab:
+
+- Number of decoding attempts: set it as per required decoding time. It might be set to 1 if CPU frequency is 2GHz,
+  and set to 3 if CPU frequency is equal to 3GHz. Higher values make better decoding performance.
+
+- Number of decoding passes = 4 (may be set to 3 or 2 for CPU frequency less than 2GHz if decoding attempts=1 is 
+  not enough to get into 10 second decoding time). For VHF usage optimal number of decoding passes = 2, and number
+  of decoding attempts may be increased to improve decoding efficiency.
+
+- RX frequency decoding attempts: set it to 1 for slow CPU, 2 for fast CPU. Value 3 may be used for 8+ core CPUs.
+
+- Harmonics decoding depth. Set it to 0 if you would like to turn off this functionality. Value 3 can be used for
+  most CPUs and provides good efficiency for decoding of the harmonics, value 4 can be used with fast CPUs.
+
+- Hinted decoding DT range = 1
+
+- use frequency mask decoding: frequency mask being derived from the first decoding pass.
+  Frequency mask decoding is enabled in the code by default, depending on number of the signals on the band 
+  software making decision to turn it OFF (software does recognize band conditions and frequency mask decoding 
+  can be automatically turned off if there are too many signals on the band). New setting in the Advanced tab 
+  does prohibit turning frequency mask decoding passes OFF, it makes some benefit for overloaded band scenario 
+  and shall be used if user has fast CPU.
+
+T10 mode settings:
+
+Set number of decoding attempts to 1, this value can be increased if CPU is fast enough to finish decoding
+until expiration of the decoding timer. Too high number of decoding attempts can cause degradation of the decoding 
+efficiency if list of candidates being cut off by decoding timer.
+
+
+
+Frequency range on the waterfall: set waterfall window size to the frequency range you wish to be decoded.
+Bins/Pixel settings would let user to choose suitable waterfall window size. Any signal located outside of the 
+watefall graph WILL NOT be decoded.
+
+  To get proper hinted decoding and FTSRD false decodes filtering operation CALL3.TXT file shall be 
+copied to the JTDX log directory (from JTDX software do  File -> Open log directory). 
+
+  JTDX software is making some false FTRSD and hinted decodes. Any hinted decode marked by asterisk 
+and FTRSD decodes marked by questionmark, being blocked for sending to the pskreporter.info server, 
+but can be reported by JTAlert software to the hamspots.net server.  
+
+Warning: high number of decoding attempts setting and SWL mode take high CPU utilisation for prolonged time, 
+causing greater power consumption and increased power dissipation/CPU cooling requirements. 
+
+
